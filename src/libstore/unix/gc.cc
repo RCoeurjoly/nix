@@ -4,6 +4,7 @@
 #include "finally.hh"
 #include "unix-domain-socket.hh"
 #include "signals.hh"
+#include "shared.hh"
 
 #if !defined(__linux__)
 // For shelling out to lsof
@@ -41,7 +42,10 @@ static void makeSymlink(const Path & link, const Path & target)
     createDirs(dirOf(link));
 
     /* Create the new symlink. */
-    Path tempLink = fmt("%1%.tmp-%2%-%3%", link, getpid(), random());
+    std::mt19937& rng = RandomGenerator::getInstance();
+    std::uniform_int_distribution<int> dist(0, 99);
+    int randomNumber = dist(rng);
+    Path tempLink = fmt("%1%.tmp-%2%-%3%", link, getpid(), randomNumber);
     createSymlink(target, tempLink);
 
     /* Atomically replace the old one. */

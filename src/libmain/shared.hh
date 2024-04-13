@@ -13,7 +13,8 @@
 #include <signal.h>
 
 #include <locale>
-
+#include <random>
+#include <chrono>
 
 namespace nix {
 
@@ -146,5 +147,35 @@ extern std::function<void(siginfo_t * info, void * ctx)> stackOverflowHandler;
  */
 void defaultStackOverflowHandler(siginfo_t * info, void * ctx);
 #endif
+
+class RandomGenerator {
+private:
+    static std::mt19937 instance;
+    static bool initialized;
+
+    RandomGenerator() {}  // Private constructor
+
+public:
+    // Delete copy constructor and assignment operator
+    RandomGenerator(const RandomGenerator&) = delete;
+    RandomGenerator& operator=(const RandomGenerator&) = delete;
+
+    // Initialize the random number generator
+    static void init() {
+        if (!initialized) {
+            unsigned seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+            instance.seed(seed);
+            initialized = true;
+        }
+    }
+
+    // Get the singleton instance of the random number generator
+    static std::mt19937& getInstance() {
+        if (!initialized) {
+            init();  // Ensure it's initialized
+        }
+        return instance;
+    }
+};
 
 }

@@ -30,6 +30,9 @@ char * * savedArgv;
 
 static bool gcWarning = true;
 
+std::mt19937 RandomGenerator::instance;
+bool RandomGenerator::initialized = false;
+
 void printGCWarning()
 {
     if (!gcWarning) return;
@@ -173,12 +176,13 @@ void initNix()
        everybody. */
     umask(0022);
 
-#ifndef _WIN32
-    /* Initialise the PRNG. */
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    srandom(tv.tv_usec);
-#endif
+    RandomGenerator::init();
+// #ifndef _WIN32
+//     /* Initialise the PRNG. */
+//     struct timeval tv;
+//     gettimeofday(&tv, 0);
+//     srandom(tv.tv_usec);
+// #endif
 
 
 }
